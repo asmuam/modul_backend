@@ -1,0 +1,1 @@
+// Anda tidak perlu mengisi userModel.js jika menggunakan Prisma, karena semua interaksi dengan model User diatur melalui Prisma Client.
