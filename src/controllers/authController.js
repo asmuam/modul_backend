@@ -42,7 +42,8 @@ const logout = async (req, res) => {
     const refreshToken = req.cookies.refreshToken;
 
     if (refreshToken) {
-      await authService.logoutUser(refreshToken); // Pass the refreshToken to remove it from the database
+      // Pass the refreshToken to remove it from the database
+      await authService.logoutUser(refreshToken);
       res.clearCookie("refreshToken"); // Clear the cookie
     }
 
@@ -69,7 +70,7 @@ const refresh = async (req, res) => {
       // Failed to refresh token
       res.status(401).send("Invalid refresh token or user not found");
     }
-  
+
   } catch (error) {
     // Log the error and send a generic error response
     console.error("Error during token refresh:", error.message);
@@ -78,4 +79,9 @@ const refresh = async (req, res) => {
 };
 
 
-export { register, login, logout, refresh };
+export {
+  register,
+  login,
+  logout,
+  refresh
+};

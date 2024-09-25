@@ -11,7 +11,7 @@ const getUsers = async (req, res) => {
 
 const getUser = async (req, res) => {
     try {
-        const user = await userService.getUserById(parseInt(req.params.id));
+        const user = await userService.getUserById(parseInt(req.params.userId));
         if (user) {
             res.json(user);
         } else {
@@ -28,7 +28,8 @@ const createUser = async (req, res) => {
         const { username, email } = req.body;
 
         // Check if a user with the same username or email already exists
-        const existingUser = await userService.findUserByUsernameOrEmail(username, email);
+        const existingUser = await userService.
+            findUserByUsernameOrEmail(username, email);
 
         if (existingUser) {
             return res.status(409).send('User already exists');
@@ -48,7 +49,8 @@ const createUser = async (req, res) => {
 
 const updateUser = async (req, res) => {
     try {
-        const user = await userService.updateUser(parseInt(req.params.id), req.body);
+        const user = await userService.updateUser(parseInt(req.params.userId),
+            req.body);
         res.json(user);
     } catch (error) {
         res.status(400).send(error.message);
@@ -58,7 +60,7 @@ const updateUser = async (req, res) => {
 const deleteUser = async (req, res) => {
     try {
         // Parse user ID from request parameters
-        const userId = parseInt(req.params.id, 10);
+        const userId = parseInt(req.params.userId, 10);
 
         // Call the service to delete the user and get the deleted user data
         const deletedUser = await userService.deleteUser(userId);
@@ -76,4 +78,10 @@ const deleteUser = async (req, res) => {
 };
 
 
-export { getUsers, createUser, getUser, updateUser, deleteUser };
+export {
+    getUsers,
+    createUser,
+    getUser,
+    updateUser,
+    deleteUser
+};

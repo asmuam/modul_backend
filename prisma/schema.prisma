@@ -13,14 +13,14 @@ generator client {
   provider = "prisma-client-js"
 }
 
-model User {
-  id        Int      @id @default(autoincrement())
-  username  String   @unique
-  name      String   
-  password  String
-  email     String   @unique
-  role      String   @default("USER")  // Add role field with default value
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-  refresh_token  String? @db.VarChar(255) // Adjust length as needed
+model user {
+  id            Int      @id @default(autoincrement())
+  username      String   @unique
+  name          String   
+  password      String
+  email         String   @unique
+  role          String   @default("USER")  // Add role field with default value
+  date_created  DateTime @default(now())
+  date_updated  DateTime @default(now())
+  refresh_token String?  @db.VarChar(255) // Adjust length as needed
 }

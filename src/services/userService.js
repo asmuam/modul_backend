@@ -1,4 +1,5 @@
 import { prisma } from '../database.js';
+import bcrypt from 'bcrypt';
 
 const getAllUsers = async () => {
     return await prisma.user.findMany();
@@ -17,9 +18,17 @@ const findUserByUsernameOrEmail = async (username, email) => {
 
 const createUser = async (userData) => {
     try {
+        // Hash password yang ada di userData
+        const hashedPassword = await bcrypt.hash(userData.password, 10);
+
+        // Buat user dengan password yang sudah di-hash
         const user = await prisma.user.create({
-            data: userData
+            data: {
+                ...userData,
+                password: hashedPassword, // Ganti password dengan hashedPassword
+            }
         });
+
         return user;
     } catch (error) {
         console.error("Error creating user:", error.message);
@@ -57,4 +66,11 @@ const deleteUser = async (id) => {
 };
 
 
-export { getAllUsers, createUser, getUserById, updateUser, deleteUser, findUserByUsernameOrEmail };
+export {
+    getAllUsers,
+    createUser,
+    getUserById,
+    updateUser,
+    deleteUser,
+    findUserByUsernameOrEmail
+};

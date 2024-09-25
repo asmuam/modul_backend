@@ -13,7 +13,7 @@ const authMiddleware = (roles = []) => {
                 if (roles.length && !roles.includes(decoded.role)) {
                     return res.status(403).send('Forbidden');
                 }
-                
+
                 next();
             } catch (error) {
                 res.status(401).send('Unauthorized');

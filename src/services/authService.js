@@ -92,7 +92,7 @@ const refreshToken = async (refreshToken) => {
 
 const logoutUser = async (refreshToken) => {
   try {
-    const decoded = jwt.verify(refreshToken, config.refreshSecret);
+    const decoded = verifyToken(refreshToken, config.refreshSecret);
     await prisma.user.update({
       where: { id: decoded.id },
       data: { refresh_token: null },
