@@ -1,0 +1,14 @@
+# TODO List
+
+## Fitur yang Perlu Ditambahkan
+- [ ] express-validator validation n sanitazion
+- [ ] winston logger
+- [ ] express-rate-limit
+- [ ] passport auth middleware
+- [ ] compression middleware
+## Perbaikan Bug
+- [ ] 
+## Peningkatan Kode
+- [ ] 
+## Dokumentasi
+- [ ] 
