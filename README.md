@@ -2,7 +2,7 @@
 
 ## Deskripsi
 
-    Proyek ini adalah modul backend untuk aplikasi portfolio yang mengelola autentikasi pengguna, data user, dan integrasi dengan Prisma sebagai ORM untuk manajemen database. Backend ini dibangun menggunakan Node.js dengan Express, dan dilengkapi dengan tes unit menggunakan Jest.
+    Proyek ini adalah modul backend untuk aplikasi portfolio yang mengelola autentikasi pengguna, data user, dan integrasi dengan Prisma sebagai ORM/ODM untuk manajemen database. Backend ini dibangun menggunakan Node.js dengan Express, dan dilengkapi dengan tes unit menggunakan Jest.
 
 ## Style Guide
 
@@ -51,6 +51,7 @@ MODUL_BACKEND/
 │   ├── user.test.js           # Unit test untuk pengelolaan pengguna
 │   └── users.test.js.example  # Contoh test pengguna
 ├── .babelrc                   # Konfigurasi Babel untuk transpiling
+├── .env                       # Konfigurasi lingkungan (.env)
 ├── .gitignore                 # Mengabaikan file yang tidak perlu ke Git
 ├── package-lock.json          # File kunci dependensi npm
 ├── package.json               # File konfigurasi npm
