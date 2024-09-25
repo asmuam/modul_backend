@@ -124,15 +124,32 @@ npm test
 
 ## Teknologi yang Digunakan
 
-**Node.js:** Runtime JavaScript untuk backend.
+**Node.js:**
+Runtime JavaScript untuk backend yang memungkinkan Anda menjalankan JavaScript di server. Node.js dikenal karena kemampuannya untuk menangani banyak koneksi secara bersamaan berkat model I/O yang non-blok.
 
-**Express.js:** Framework untuk membuat server HTTP.
+**Express.js:**
+Framework untuk membuat server HTTP dengan sintaks yang sederhana dan fleksibel, memudahkan pengembangan aplikasi web dan API. Express.js menyediakan banyak middleware untuk menangani permintaan dan respons HTTP.
 
-**Prisma:** ORM/ODM untuk interaksi database.
+**Prisma:**
+ORM (Object-Relational Mapping) untuk interaksi dengan database. Prisma memudahkan pengelolaan database dengan menggunakan model yang kuat, menyediakan tipe data yang kuat dan query yang intuitif.
 
-**JWT**: JSON Web Token untuk autentikasi.
+**JWT (JSON Web Token):**
+Metode untuk mengautentikasi pengguna melalui token yang dapat dipertukarkan. JWT memungkinkan server untuk menghasilkan token saat pengguna berhasil login dan pengguna dapat menggunakan token ini untuk mengakses endpoint yang dilindungi.
 
-**Jest**: Framework untuk pengujian unit.
+**Jest:**
+Framework untuk pengujian unit yang digunakan untuk menulis dan menjalankan pengujian JavaScript. Jest menawarkan kemampuan pengujian yang cepat dan efisien serta dukungan untuk pengujian asinkron.
+
+**bcrypt:**
+Library untuk hashing password yang menyediakan fungsi hashing yang aman. Bcrypt membantu melindungi password pengguna dengan mengenkripsi password sebelum disimpan ke database.
+
+**cookie-parser:**
+Middleware Express.js untuk mem-parsing cookie dari permintaan HTTP. Cookie-parser memudahkan akses data cookie yang dikirim oleh klien.
+
+**cors:**
+Middleware untuk mengizinkan Cross-Origin Resource Sharing (CORS), memungkinkan aplikasi web di satu domain untuk melakukan permintaan ke server di domain lain.
+
+**supertest:**
+Library untuk menguji endpoint HTTP dalam aplikasi Node.js. Supertest menyediakan API yang intuitif untuk melakukan permintaan dan memverifikasi respons yang diterima.
 
 ## API Endpoints
 
