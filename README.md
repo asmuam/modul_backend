@@ -20,7 +20,7 @@ Proyek ini adalah modul backend untuk aplikasi portfolio yang mengelola autentik
 - kurung kurawal objek selalu satu baris dengan nama objek kecuali jika ditulis terkompresi
 - named export dibandingkan export default kecuali untuk file dengan 1 fungsi/method/etc diletakkan diakhir baris
 - menggunakan commit convention
-- otomatis test sebelum commit
+- otomatis test sebelum commit (dihapus sementara)
 
 ## Struktur Folder
 
