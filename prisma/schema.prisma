@@ -16,6 +16,7 @@ generator client {
 model User {
   id        Int      @id @default(autoincrement())
   username  String   @unique
+  name      String   
   password  String
   email     String   @unique
   role      String   @default("USER")  // Add role field with default value

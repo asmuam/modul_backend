@@ -1,3 +1,4 @@
+import config from '../config.js';
 import * as authService from '../services/authService.js';
 
 const authMiddleware = (roles = []) => {
@@ -5,7 +6,7 @@ const authMiddleware = (roles = []) => {
         const token = req.headers['authorization']?.split(' ')[1];
         if (token) {
             try {
-                const decoded = authService.verifyToken(token);
+                const decoded = authService.verifyToken(token, config.jwtSecret);
                 req.user = decoded;
 
                 // Check if user has required role

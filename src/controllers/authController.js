@@ -2,18 +2,23 @@ import * as authService from "../services/authService.js";
 
 const register = async (req, res) => {
   try {
-    const { username, password, email } = req.body;
-    await authService.registerUser(username, password, email);
+    const { username, password, email, name, role } = req.body;
+    await authService.registerUser(username, password, email, name, role);
     res.status(201).send("User registered");
   } catch (error) {
-    res.status(400).send(error.message);
+    if (error.message === 'User with this username or email already exists') {
+      res.status(409).send(error.message); // Conflict for duplicate users
+    } else {
+      res.status(400).send(error.message); // Bad request for other errors
+    }
   }
 };
+
 
 const login = async (req, res) => {
   try {
     const { username, password } = req.body;
-    const { token, refreshToken } = await authService.authenticateUser(
+    const { uid, name, token, refreshToken } = await authService.authenticateUser(
       username,
       password
     );
@@ -23,10 +28,10 @@ const login = async (req, res) => {
       httpOnly: true,
       secure: process.env.NODE_ENV === "production", // Set secure flag in production
       sameSite: "Strict", // Adjust based on your requirements
-      maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
+      maxAge: 30 * 24 * 60 * 60 * 1000, // 30 days
     });
 
-    res.json({ token });
+    res.json({ uid, name, token });
   } catch (error) {
     res.status(401).send(error.message);
   }
@@ -47,7 +52,7 @@ const logout = async (req, res) => {
   }
 };
 
-const refreshToken = async (req, res) => {
+const refresh = async (req, res) => {
   try {
     const refreshToken = req.cookies.refreshToken;
 
@@ -56,10 +61,21 @@ const refreshToken = async (req, res) => {
     }
 
     const newToken = await authService.refreshToken(refreshToken);
-    res.json({ token: newToken });
+
+    if (newToken) {
+      // Successfully refreshed token
+      res.json({ token: newToken });
+    } else {
+      // Failed to refresh token
+      res.status(401).send("Invalid refresh token or user not found");
+    }
+  
   } catch (error) {
-    res.status(401).send(error.message);
+    // Log the error and send a generic error response
+    console.error("Error during token refresh:", error.message);
+    res.status(401).send("An error occurred during token refresh");
   }
 };
 
-export { register, login, logout, refreshToken };
+
+export { register, login, logout, refresh };
