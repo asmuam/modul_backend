@@ -2,7 +2,7 @@
 
 ## Deskripsi
 
-Proyek ini adalah modul backend untuk aplikasi portfolio yang mengelola autentikasi pengguna, data user, dan integrasi dengan Prisma sebagai ORM/ODM untuk manajemen database. Backend ini dibangun menggunakan Node.js dengan Express, dan dilengkapi dengan tes unit menggunakan Jest.
+Proyek ini adalah modul backend sebagai baseline dengan fitur autentikasi pengguna, manajemen data user, dan integrasi dengan Prisma sebagai ORM/ODM untuk manajemen database. Backend ini dibangun menggunakan Node.js dengan Express,dan bebereapa library pendukung serta dilengkapi dengan tes unit menggunakan Jest - Supertest.
 
 ## Style Guide
 
@@ -21,11 +21,13 @@ Proyek ini adalah modul backend untuk aplikasi portfolio yang mengelola autentik
 - named export dibandingkan export default kecuali untuk file dengan 1 fungsi/method/etc diletakkan diakhir baris
 - menggunakan commit convention
 - otomatis test sebelum commit (dihapus sementara)
+- prettier dan eslint
 
 ## Struktur Folder
 
 ```bash
 MODUL_BACKEND/
+├── .husky/                    # Hooks git.
 ├── prisma/
 │   ├── migrations/            # Folder untuk file migrasi Prisma
 │   └── schema.prisma          # Skema Prisma untuk manajemen database
@@ -54,10 +56,14 @@ MODUL_BACKEND/
 │   └── users.test.js.example  # Contoh test pengguna
 ├── .babelrc                   # Konfigurasi Babel untuk transpiling
 ├── .env                       # Konfigurasi lingkungan (.env)
+├── .eslintrc.json             # Aturan linting kode ESLint
 ├── .gitignore                 # Mengabaikan file yang tidak perlu ke Git
+├── .prettierrc                # Format kode dengan prettier
+├── .commitlint.config.js      # Validasi pesan commit
 ├── package-lock.json          # File kunci dependensi npm
 ├── package.json               # File konfigurasi npm
 └── README.md                  # Dokumentasi proyek ini
+└── TODO                       # TODO proyek ini
 ```
 
 ## Langkah-Langkah Instalasi
@@ -65,14 +71,15 @@ MODUL_BACKEND/
 ### Kloning Repository:
 
 ```bash
-git clone https://github.com/username/modul_backend.git
+git clone https://github.com/asmuam/modul_backend.git
 cd modul_backend
 ```
 
-### Instal Dependensi:
+### Instal Dependensi dan Husky:
 
 ```bash
 npm install
+npm prepare
 ```
 
 ### Konfigurasi Variabel Lingkungan
