@@ -96,10 +96,12 @@ npx prisma migrate dev
 
 ### Menjalankan Server
 
-Jalankan server di mode development:
+Jalankan server:
 
 ```bash
-npm run dev
+npm run start
+## using nodemon
+npm run nodemon
 ```
 
 ### Menjalankan Tes
