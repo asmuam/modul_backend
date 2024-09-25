@@ -1,4 +1,6 @@
-# Modul Backend - Portfolio App
+# Modul Backend - asmuam Baseline
+
+
 
 ## Deskripsi
 
@@ -19,6 +21,8 @@
 - nama pada database : snake_case
 - kurung kurawal objek selalu satu baris dengan nama objek kecuali jika ditulis terkompresi
 - named export dibandingkan export default kecuali untuk file dengan 1 fungsi/method/etc diletakkan diakhir baris
+- menggunakan commit convention
+- otomatis test sebelum commit
 
 ## Struktur Folder
 
@@ -101,7 +105,7 @@ Jalankan server:
 ```bash
 npm run start
 ## using nodemon
-npm run nodemon
+npm run dev
 ```
 
 ### Menjalankan Tes
@@ -178,6 +182,81 @@ Library untuk menguji endpoint HTTP dalam aplikasi Node.js. Supertest menyediaka
 `PATCH` `/api/users/:userId`: Memperbarui sebagian data pengguna.
 
 `DELETE` `/api/users/:userId`: Menghapus pengguna.
+
+
+## Panduan Conventional Commits
+  Conventional Commits adalah spesifikasi untuk menulis pesan commit yang dapat diinterpretasikan secara otomatis. Dengan mengikuti spesifikasi ini, Anda dapat dengan mudah menghasilkan changelog dan memahami sejarah perubahan dalam proyek.
+
+Format Pesan Commit
+Pesan commit harus mengikuti format berikut:
+
+```bash
+<type>(<scope>): <subject>
+<body>
+<footer>
+```
+
+Penjelasan Format
+
+**type**: Jenis perubahan yang Anda buat. Berikut adalah beberapa tipe yang umum digunakan:
+
+`feat`: Menambahkan fitur baru.
+
+`fix`: Memperbaiki bug.
+
+`docs`: Perubahan hanya pada dokumentasi.
+
+`style`: Perubahan yang tidak mempengaruhi makna kode (spasi, format, dll).
+
+`refactor`: Perubahan kode yang tidak menambah fitur atau memperbaiki bug.
+
+`perf`: Perubahan yang meningkatkan kinerja.
+
+`test`: Menambahkan tes yang hilang atau memperbaiki tes yang ada.
+
+`chore`: Perubahan pada alat pengembangan atau pustaka yang tidak mempengaruhi kode sumber.
+
+**scope**: (Opsional) Bagian dari kode yang dipengaruhi oleh perubahan. Ini dapat berupa nama modul, komponen, atau bagian dari aplikasi.
+
+**subject**: Deskripsi singkat tentang perubahan. Harus dalam bentuk imperatif (misalnya, "tambah", "perbaiki", "hapus").
+
+**body**: (Opsional) Penjelasan lebih lanjut tentang perubahan, termasuk alasan dan konteks jika perlu.
+
+**footer**: (Opsional) Mengandung informasi tambahan, seperti referensi ke issue yang ditutup, misalnya:
+
+```bash
+Closes #123
+```
+
+### Contoh Pesan Commit
+Berikut adalah beberapa contoh pesan commit yang mengikuti pedoman Conventional Commits:
+
+Menambahkan fitur baru:
+```scss
+feat(auth): tambahkan autentikasi JWT
+```
+Memperbaiki bug:
+```scss
+fix(ui): perbaiki masalah tampilan pada halaman login
+```
+Mengupdate dokumentasi:
+```scss
+docs(README): tambahkan contoh penggunaan API
+```
+Melakukan refactor:
+```scss
+refactor(user): ubah struktur data pengguna
+```
+Menambah pengujian:
+```scss
+test(auth): tambahkan pengujian untuk fungsi login
+```
+### Kesalahan Umum
+**subject-empty**: Subjek pesan commit tidak boleh kosong.
+**type-empty**: Tipe pesan commit tidak boleh kosong.
+**subject may not be empty**: Pastikan subjek pesan commit Anda tidak kosong dan mendeskripsikan perubahan.
+### Menggunakan Commitlint
+Untuk memastikan bahwa pesan commit Anda mengikuti pedoman ini, kami menggunakan Commitlint. Jika Anda melakukan commit yang tidak memenuhi kriteria, Anda akan menerima pesan kesalahan yang memberi tahu Anda tentang masalah tersebut.
 
 ## Kontribusi
 
