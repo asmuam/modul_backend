@@ -1,10 +1,8 @@
 # Modul Backend - asmuam Baseline
 
-
-
 ## Deskripsi
 
-  Proyek ini adalah modul backend untuk aplikasi portfolio yang mengelola autentikasi pengguna, data user, dan integrasi dengan Prisma sebagai ORM/ODM untuk manajemen database. Backend ini dibangun menggunakan Node.js dengan Express, dan dilengkapi dengan tes unit menggunakan Jest.
+Proyek ini adalah modul backend untuk aplikasi portfolio yang mengelola autentikasi pengguna, data user, dan integrasi dengan Prisma sebagai ORM/ODM untuk manajemen database. Backend ini dibangun menggunakan Node.js dengan Express, dan dilengkapi dengan tes unit menggunakan Jest.
 
 ## Style Guide
 
@@ -183,9 +181,9 @@ Library untuk menguji endpoint HTTP dalam aplikasi Node.js. Supertest menyediaka
 
 `DELETE` `/api/users/:userId`: Menghapus pengguna.
 
-
 ## Panduan Conventional Commits
-  Conventional Commits adalah spesifikasi untuk menulis pesan commit yang dapat diinterpretasikan secara otomatis. Dengan mengikuti spesifikasi ini, Anda dapat dengan mudah menghasilkan changelog dan memahami sejarah perubahan dalam proyek.
+
+Conventional Commits adalah spesifikasi untuk menulis pesan commit yang dapat diinterpretasikan secara otomatis. Dengan mengikuti spesifikasi ini, Anda dapat dengan mudah menghasilkan changelog dan memahami sejarah perubahan dalam proyek.
 
 Format Pesan Commit
 Pesan commit harus mengikuti format berikut:
@@ -229,33 +227,47 @@ Closes #123
 ```
 
 ### Contoh Pesan Commit
+
 Berikut adalah beberapa contoh pesan commit yang mengikuti pedoman Conventional Commits:
 
 Menambahkan fitur baru:
+
 ```scss
-feat(auth): tambahkan autentikasi JWT
+feat(auth): tambahkan autentikasi JWT;
 ```
+
 Memperbaiki bug:
+
 ```scss
-fix(ui): perbaiki masalah tampilan pada halaman login
+fix(ui): perbaiki masalah tampilan pada halaman login;
 ```
+
 Mengupdate dokumentasi:
+
 ```scss
-docs(README): tambahkan contoh penggunaan API
+docs(README): tambahkan contoh penggunaan API;
 ```
+
 Melakukan refactor:
+
 ```scss
-refactor(user): ubah struktur data pengguna
+refactor(user): ubah struktur data pengguna;
 ```
+
 Menambah pengujian:
+
 ```scss
-test(auth): tambahkan pengujian untuk fungsi login
+test(auth): tambahkan pengujian untuk fungsi login;
 ```
+
 ### Kesalahan Umum
+
 **subject-empty**: Subjek pesan commit tidak boleh kosong.
 **type-empty**: Tipe pesan commit tidak boleh kosong.
 **subject may not be empty**: Pastikan subjek pesan commit Anda tidak kosong dan mendeskripsikan perubahan.
+
 ### Menggunakan Commitlint
+
 Untuk memastikan bahwa pesan commit Anda mengikuti pedoman ini, kami menggunakan Commitlint. Jika Anda melakukan commit yang tidak memenuhi kriteria, Anda akan menerima pesan kesalahan yang memberi tahu Anda tentang masalah tersebut.
 
 ## Kontribusi
