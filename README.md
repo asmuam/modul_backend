@@ -17,11 +17,19 @@ Proyek ini adalah modul backend sebagai baseline dengan fitur autentikasi penggu
 - spasi antara operator
 - panjang baris < 80 karakter
 - nama pada database : snake_case
-- kurung kurawal objek selalu satu baris dengan nama objek kecuali jika ditulis terkompresi
+-
+
+## Code Guide
+
+- validator pada route
+- controller fokus mengatur alur data dari req ke service
+- eksekusi db berada di service layer
 - named export dibandingkan export default kecuali untuk file dengan 1 fungsi/method/etc diletakkan diakhir baris
 - menggunakan commit convention
 - otomatis test sebelum commit (dihapus sementara)
 - prettier dan eslint
+- kurung kurawal objek selalu satu baris dengan nama objek kecuali jika ditulis terkompresi
+-
 
 ## Struktur Folder
 
@@ -125,9 +133,11 @@ npm test
 
 **Autentikasi**: Login, registrasi, logout, refresh token, menggunakan JWT.
 
+**Validasi dan Sanitasi**: Menggunakan express-validator.
+
 **Pengelolaan Pengguna**: CRUD data pengguna.
 
-**Database**: Menggunakan Prisma sebagai ORM dengan dukungan PostgreSQL/MongoDB.
+**Database**: Menggunakan Prisma sebagai ORM/ODM dengan dukungan PostgreSQL/MongoDB/MySQL.
 
 **Testing**: Unit testing dengan Jest.
 
@@ -161,6 +171,8 @@ Middleware untuk mengizinkan Cross-Origin Resource Sharing (CORS), memungkinkan 
 
 **supertest:**
 Library untuk menguji endpoint HTTP dalam aplikasi Node.js. Supertest menyediakan API yang intuitif untuk melakukan permintaan dan memverifikasi respons yang diterima.
+
+**express-validator:**
 
 ## API Endpoints
 
@@ -228,6 +240,8 @@ Penjelasan Format
 **body**: (Opsional) Penjelasan lebih lanjut tentang perubahan, termasuk alasan dan konteks jika perlu.
 
 **footer**: (Opsional) Mengandung informasi tambahan, seperti referensi ke issue yang ditutup, misalnya:
+
+*dalam implementasinya masih fleksibel untuk subject/scope/body yang terpenting typenya usahakan sesuai
 
 ```bash
 Closes #123

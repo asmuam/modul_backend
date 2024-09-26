@@ -1,7 +1,7 @@
-import jwt from "jsonwebtoken";
-import bcrypt from "bcrypt";
-import { prisma } from "../database.js";
-import config from "../config.js";
+import jwt from 'jsonwebtoken';
+import bcrypt from 'bcrypt';
+import { prisma } from '../database.js';
+import config from '../config.js';
 
 const registerUser = async (username, password, email, name, role) => {
   // Check if user with the given username or email already exists
@@ -12,7 +12,7 @@ const registerUser = async (username, password, email, name, role) => {
   });
 
   if (existingUser) {
-    throw new Error("User with this username or email already exists");
+    throw new Error('User with this username or email already exists');
   }
 
   const hashedPassword = await bcrypt.hash(password, 10);
@@ -22,21 +22,28 @@ const registerUser = async (username, password, email, name, role) => {
       password: hashedPassword,
       email,
       name,
-      role: role || "USER",
+      role: role || 'USER',
     },
   });
 };
 
-const authenticateUser = async (username, password) => {
-  const user = await prisma.user.findUnique({ where: { username } });
+const authenticateUser = async (login, password) => {
+  // Determine if login is an email or username
+  const isEmail = /\S+@\S+\.\S+/.test(login);
+
+  // Find user by username or email
+  const user = await prisma.user.findUnique({
+    where: isEmail ? { email: login } : { username: login },
+  });
+
   if (user && (await bcrypt.compare(password, user.password))) {
     const token = jwt.sign(
       { id: user.id, username: user.username, role: user.role },
       config.jwtSecret,
-      { expiresIn: "1h" }
+      { expiresIn: '1h' }
     );
     const refreshToken = jwt.sign({ id: user.id }, config.refreshSecret, {
-      expiresIn: "30d",
+      expiresIn: '30d',
     });
 
     // Save refresh token to the database
@@ -45,9 +52,16 @@ const authenticateUser = async (username, password) => {
       data: { refresh_token: refreshToken },
     });
 
-    return { uid: user.id, name: user.name, token, refreshToken };
+    return {
+      uid: user.id,
+      name: user.name,
+      username: user.username,
+      token,
+      refreshToken,
+      role: user.role,
+    };
   }
-  throw new Error("Invalid credentials");
+  throw new Error('Invalid credentials');
 };
 
 const verifyToken = (token, config) => {
@@ -64,13 +78,13 @@ const refreshToken = async (refreshToken) => {
 
     // Check if user exists
     if (!user) {
-      console.warn("User not found for refresh token:", decoded.id);
+      console.warn('User not found for refresh token:', decoded.id);
       return null; // Indicate failure
     }
 
     // Check if the refresh token matches
     if (user.refresh_token !== refreshToken) {
-      console.warn("Invalid refresh token:", refreshToken);
+      console.warn('Invalid refresh token:', refreshToken);
       return null; // Indicate failure
     }
 
@@ -78,14 +92,13 @@ const refreshToken = async (refreshToken) => {
     const token = jwt.sign(
       { id: user.id, username: user.username, role: user.role },
       config.jwtSecret,
-      { expiresIn: "1h" }
+      { expiresIn: '1h' }
     );
 
     return token;
-
   } catch (error) {
     // Log detailed error and return null
-    console.error("Error in refreshToken:", error.message);
+    console.error('Error in refreshToken:', error.message);
     return null;
   }
 };
@@ -98,7 +111,7 @@ const logoutUser = async (refreshToken) => {
       data: { refresh_token: null },
     });
   } catch (error) {
-    throw new Error("Error during logout");
+    throw new Error('Error during logout');
   }
 };
 
