@@ -2,41 +2,54 @@ import * as userService from '../services/userService.js';
 import { validationResult } from 'express-validator';
 import { verifyToken } from '../services/authService.js';
 import config from '../config.js';
+import sendResponse from '../utils/responseUtil.js'; // Import utilitas respons
 
-const getUsers = async (req, res) => {
+const getUsers = async (req, res, next) => {
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
-    return res.status(400).json({ errors: errors.array() });
+    return sendResponse(
+      res,
+      400,
+      'Validation failed. Please check your input and try again.'
+    );
   }
   try {
     const users = await userService.getAllUsers();
-    res.json(users);
+    return sendResponse(res, 200, 'Users retrieved successfully', users);
   } catch (error) {
-    res.status(500).send(error.message);
+    next(error);
   }
 };
 
-const getUser = async (req, res) => {
+const getUser = async (req, res, next) => {
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
-    return res.status(400).json({ errors: errors.array() });
+    return sendResponse(
+      res,
+      400,
+      'Validation failed. Please check your input and try again.'
+    );
   }
   try {
     const user = await userService.getUserById(parseInt(req.params.userId));
     if (user) {
-      res.json(user);
+      return sendResponse(res, 200, 'User retrieved successfully', user);
     } else {
-      res.status(404).send('User not found');
+      return sendResponse(res, 404, 'User not found');
     }
   } catch (error) {
-    res.status(500).send(error.message);
+    next(error);
   }
 };
 
-const createUser = async (req, res) => {
+const createUser = async (req, res, next) => {
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
-    return res.status(400).json({ errors: errors.array() });
+    return sendResponse(
+      res,
+      400,
+      'Validation failed. Please check your input and try again.'
+    );
   }
   try {
     const { username, email } = req.body;
@@ -48,29 +61,32 @@ const createUser = async (req, res) => {
     );
 
     if (existingUser) {
-      return res.status(409).send('User already exists');
+      return sendResponse(res, 409, 'User already exists'); // Conflict
     }
 
     const user = await userService.createUser(req.body);
     if (user) {
-      res.status(201).json(user);
+      return sendResponse(res, 201, 'User created successfully', user); // Created
     } else {
-      res.status(400).send('Failed to Create User');
+      return sendResponse(res, 400, 'Failed to create user');
     }
   } catch (error) {
-    res.status(500).send(error.message);
+    next(error);
   }
 };
 
-const updateUser = async (req, res) => {
+const updateUser = async (req, res, next) => {
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
-    return res.status(400).json({ errors: errors.array() });
+    return sendResponse(
+      res,
+      400,
+      'Validation failed. Please check your input and try again.'
+    );
   }
-
   const refreshToken = req.cookies.refreshToken;
   if (!refreshToken) {
-    return res.status(401).send('No refresh token provided');
+    return sendResponse(res, 401, 'No refresh token provided'); // Unauthorized
   }
 
   // Decode the refresh token to get user information
@@ -85,12 +101,12 @@ const updateUser = async (req, res) => {
     const userToUpdate = await userService.getUserById(userIdToUpdate);
 
     if (!userToUpdate) {
-      return res.status(404).send('User not found');
+      return sendResponse(res, 404, 'User not found'); // Not found
     }
 
     // Check role downgrade
     if (isRoleDowngrade(currentUserRole, req.body.role)) {
-      return res.status(403).send('Cannot downgrade role');
+      return sendResponse(res, 403, 'Cannot downgrade role'); // Forbidden
     }
 
     // Proceed with the update
@@ -98,16 +114,20 @@ const updateUser = async (req, res) => {
       parseInt(req.params.userId),
       req.body
     );
-    res.json(updatedUser);
+    return sendResponse(res, 200, 'User updated successfully', updatedUser);
   } catch (error) {
-    res.status(500).send(error.message);
+    next(error);
   }
 };
 
-const deleteUser = async (req, res) => {
+const deleteUser = async (req, res, next) => {
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
-    return res.status(400).json({ errors: errors.array() });
+    return sendResponse(
+      res,
+      400,
+      'Validation failed. Please check your input and try again.'
+    );
   }
   try {
     // Parse user ID from request parameters
@@ -117,14 +137,10 @@ const deleteUser = async (req, res) => {
     const deletedUser = await userService.deleteUser(userId);
 
     // Return the deleted user data in the response
-    res.status(200).json({
-      status: 'success',
-      message: 'User deleted',
-      deletedUser,
-    });
+    return sendResponse(res, 200, 'User deleted successfully', deletedUser);
   } catch (error) {
     // Handle errors and send appropriate response
-    res.status(500).send(error.message);
+    next(error);
   }
 };
 

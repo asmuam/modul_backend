@@ -3,10 +3,11 @@
 ## Fitur yang Perlu Ditambahkan
 
 - [✅] express-validator validation n sanitazion
-- [ ] winston logger
+- [✅] winston logger
 - [✅] express-rate-limit (global)
-- [ ] passport auth middleware
+- [❕] passport auth middleware (sudah disiapkan, namun perlu env)
 - [❕] compression middleware (sudah diimplementasikan tetapi gagal dalam test)
+- [ ] perbarui test karena perbedaan respon akibat logger
 
 ## Perbaikan Bug
 

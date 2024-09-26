@@ -8,6 +8,7 @@ import config from './config.js';
 import rateLimit from 'express-rate-limit';
 import compression from 'compression';
 import logger from './utils/logger.js';
+import sendResponse from './utils/responseUtil.js'; // Import utilitas respons
 
 const largeData = {
   users: Array.from({ length: 1000000 }, (_, i) => ({
@@ -28,6 +29,7 @@ const limiter = rateLimit({
 });
 const app = express();
 
+// ----- MIDDLEWARE -----
 app.use(bodyParser.json());
 app.use(cookieParser());
 app.use(
@@ -37,48 +39,38 @@ app.use(
   })
 );
 app.use(limiter);
-
-// Middleware untuk logging
 app.use((req, res, next) => {
   logger.info(`Request: ${req.method} ${req.url}`);
-
   res.on('finish', () => {
-    if (res.statusCode >= 400) {
-      // Log error jika status code 400 ke atas
-      logger.error(`Response: ${res.statusCode} for ${req.method} ${req.url}`);
-    } else {
-      // Log info untuk status code di bawah 400
+    // Cek jika respons sudah ditangani oleh middleware penanganan kesalahan
+    if (res.statusCode < 400) {
       logger.info(`Response: ${res.statusCode} for ${req.method} ${req.url}`);
     }
   });
-
   next();
 });
-
-// Middleware untuk menangkap kesalahan
-app.use((err, req, res, next) => {
+app.use((err, req, res) => {
   logger.error(`Error: ${err.message} for ${req.method} ${req.url}`);
-  res.status(err.status || 500);
-  res.json({ message: err.message });
+  sendResponse(res, err.status || 500, 'Internal Server Error');
 });
+// ----- MIDDLEWARE -----
 
+// ----- MAIN ROUTES -----
 app.use('/api/auth', authRouter);
 app.use('/api/users', userRouter);
+// ----- MAIN ROUTES -----
+
+// ----- TEST ROUTES -----
 app.get('/api/test', (req, res) => {
   res.send('This is a test endpoint!');
 });
-
-// ----- COMPRESSION TEST -----
-// API without compression
 app.get('/api/no-compression', (req, res) => {
   res.json(largeData);
 });
-
-// API with compression (only on this route)
 app.get('/api/compression', compression({ threshold: 0 }), (req, res) => {
   res.json(largeData);
 });
-// ----- COMPRESSION TEST -----
+// ----- TEST ROUTES -----
 
 app.use((err, req, res) => {
   console.error(err.stack);

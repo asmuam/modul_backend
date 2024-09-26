@@ -1,28 +1,37 @@
 import * as authService from '../services/authService.js';
 import { validationResult } from 'express-validator';
+import sendResponse from '../utils/responseUtil.js'; // Import utilitas respons
 
-const register = async (req, res) => {
+const register = async (req, res, next) => {
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
-    return res.status(400).json({ errors: errors.array() });
+    return sendResponse(
+      res,
+      400,
+      'Validation failed. Please check your input and try again.'
+    );
   }
   try {
     const { username, password, email, name, role } = req.body;
     await authService.registerUser(username, password, email, name, role);
-    res.status(201).send('User registered');
+    return sendResponse(res, 201, 'User registered', { username, email }); // Mengirim data yang relevan
   } catch (error) {
     if (error.message === 'User with this username or email already exists') {
-      res.status(409).send(error.message); // Conflict for duplicate users
+      return sendResponse(res, 409, error.message); // Conflict for duplicate users
     } else {
-      res.status(500).send(error.message); // Internal Server Error for other errors
+      next(error);
     }
   }
 };
 
-const login = async (req, res) => {
+const login = async (req, res, next) => {
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
-    return res.status(400).json({ errors: errors.array() });
+    return sendResponse(
+      res,
+      400,
+      'Validation failed. Please check your input and try again.'
+    );
   }
   try {
     const { login, password } = req.body;
@@ -37,13 +46,13 @@ const login = async (req, res) => {
       maxAge: 30 * 24 * 60 * 60 * 1000, // 30 days
     });
 
-    res.status(200).json({ uid, name, token });
+    return sendResponse(res, 200, 'Login successful', { uid, name, token });
   } catch (error) {
-    res.status(401).send(error.message);
+    next(error);
   }
 };
 
-const logout = async (req, res) => {
+const logout = async (req, res, next) => {
   try {
     const refreshToken = req.cookies.refreshToken;
 
@@ -53,33 +62,34 @@ const logout = async (req, res) => {
       res.clearCookie('refreshToken'); // Clear the cookie
     }
 
-    res.status(200).send('Logged out successfully');
+    return sendResponse(res, 200, 'Logged out successfully');
   } catch (error) {
-    res.status(500).send(error.message);
+    next(error);
   }
 };
 
-const refresh = async (req, res) => {
+const refresh = async (req, res, next) => {
   try {
     const refreshToken = req.cookies.refreshToken;
 
     if (!refreshToken) {
-      return res.status(401).send('No refresh token provided');
+      return sendResponse(res, 401, 'No refresh token provided');
     }
 
     const newToken = await authService.refreshToken(refreshToken);
 
     if (newToken) {
       // Successfully refreshed token
-      res.json({ token: newToken });
+      return sendResponse(res, 200, 'Token refreshed successfully', {
+        token: newToken,
+      });
     } else {
       // Failed to refresh token
-      res.status(401).send('Invalid refresh token or user not found');
+      return sendResponse(res, 401, 'Invalid refresh token or user not found');
     }
   } catch (error) {
     // Log the error and send a generic error response
-    console.error('Error during token refresh:', error.message);
-    res.status(500).send('An error occurred during token refresh');
+    next(error);
   }
 };
 
