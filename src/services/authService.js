@@ -111,7 +111,7 @@ const logoutUser = async (refreshToken) => {
       data: { refresh_token: null },
     });
   } catch (error) {
-    throw new Error('Error during logout');
+    throw new Error('Error during logout :', error.message);
   }
 };
 

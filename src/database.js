@@ -7,7 +7,7 @@ class PrismaSingleton {
   constructor() {
     if (!PrismaSingleton.instance) {
       this.prisma = new PrismaClient();
-      console.log("Prisma client instance created");
+      console.log('Prisma client instance created');
       PrismaSingleton.instance = this;
     }
 
@@ -33,7 +33,4 @@ const connectDatabase = async () => {
   }
 };
 
-export {
-  prisma,
-  connectDatabase
-};
+export { prisma, connectDatabase };

@@ -6,6 +6,7 @@ import {
   refresh,
 } from '../controllers/authController.js';
 import { body } from 'express-validator';
+import passport from '../middleware/passport.js';
 
 const router = express.Router();
 
@@ -67,5 +68,52 @@ router.post(
 );
 router.post('/logout', logout);
 router.post('/refresh', refresh);
+
+router.get(
+  '/google',
+  passport.authenticate('google', { scope: ['profile', 'email'] })
+);
+
+router.get(
+  '/google/callback',
+  passport.authenticate('google', { session: false }),
+  (req, res) => {
+    // Return the JWT token and refreshToken to the client
+    res.cookie('refreshToken', req.user.refreshToken, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'Strict',
+      maxAge: 30 * 24 * 60 * 60 * 1000, // 30 days
+    });
+    res.json({
+      token: req.user.token,
+      uid: req.user.user.id,
+      name: req.user.user.name,
+    });
+  }
+);
+
+router.get(
+  '/github',
+  passport.authenticate('github', { scope: ['user:email'] })
+);
+
+router.get(
+  '/github/callback',
+  passport.authenticate('github', { session: false }),
+  (req, res) => {
+    res.cookie('refreshToken', req.user.refreshToken, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'Strict',
+      maxAge: 30 * 24 * 60 * 60 * 1000, // 30 days
+    });
+    res.json({
+      token: req.user.token,
+      uid: req.user.user.id,
+      name: req.user.user.name,
+    });
+  }
+);
 
 export default router;
