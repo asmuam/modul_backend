@@ -4,9 +4,9 @@
 
 - [✅] express-validator validation n sanitazion
 - [ ] winston logger
-- [ ] express-rate-limit
+- [✅] express-rate-limit (global)
 - [ ] passport auth middleware
-- [ ] compression middleware
+- [❕] compression middleware (sudah diimplementasikan tetapi gagal dalam test)
 
 ## Perbaikan Bug
 
