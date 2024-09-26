@@ -16,7 +16,6 @@ export default [{
     ignores: ["**/*.test.js"],
 }, ...compat.extends(
     "eslint:recommended",
-    "plugin:node/recommended",
     "plugin:prettier/recommended",
 ), {
     languageOptions: {
