@@ -16,5 +16,6 @@
     "prettier/prettier": ["error"],
     "no-console": "off",
     "no-unused-vars": "warn"
-  }
+  },
+  "ignorePatterns": ["*.test.js"] // Add this line to ignore test files
 }
