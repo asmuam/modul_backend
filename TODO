@@ -7,7 +7,7 @@
 - [✅] express-rate-limit (global)
 - [❕] passport auth middleware (sudah disiapkan, namun perlu env)
 - [❕] compression middleware (sudah diimplementasikan tetapi gagal dalam test)
-- [ ] perbarui test karena perbedaan respon akibat logger
+- [✅] perbarui test karena perbedaan respon akibat logger
 
 ## Perbaikan Bug
 
