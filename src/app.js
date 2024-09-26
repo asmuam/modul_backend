@@ -7,6 +7,7 @@ import cors from 'cors';
 import config from './config.js';
 import rateLimit from 'express-rate-limit';
 import compression from 'compression';
+import logger from './utils/logger.js';
 
 const largeData = {
   users: Array.from({ length: 1000000 }, (_, i) => ({
@@ -37,6 +38,30 @@ app.use(
 );
 app.use(limiter);
 
+// Middleware untuk logging
+app.use((req, res, next) => {
+  logger.info(`Request: ${req.method} ${req.url}`);
+
+  res.on('finish', () => {
+    if (res.statusCode >= 400) {
+      // Log error jika status code 400 ke atas
+      logger.error(`Response: ${res.statusCode} for ${req.method} ${req.url}`);
+    } else {
+      // Log info untuk status code di bawah 400
+      logger.info(`Response: ${res.statusCode} for ${req.method} ${req.url}`);
+    }
+  });
+
+  next();
+});
+
+// Middleware untuk menangkap kesalahan
+app.use((err, req, res, next) => {
+  logger.error(`Error: ${err.message} for ${req.method} ${req.url}`);
+  res.status(err.status || 500);
+  res.json({ message: err.message });
+});
+
 app.use('/api/auth', authRouter);
 app.use('/api/users', userRouter);
 app.get('/api/test', (req, res) => {
@@ -44,8 +69,6 @@ app.get('/api/test', (req, res) => {
 });
 
 // ----- COMPRESSION TEST -----
-console.log('Number of users:', largeData.users.length);
-
 // API without compression
 app.get('/api/no-compression', (req, res) => {
   res.json(largeData);
