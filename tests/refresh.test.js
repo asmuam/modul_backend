@@ -1,47 +1,41 @@
 import request from 'supertest';
 import app from '../src/app.js';
-import { prisma } from "../src/database.js";
-
+import { prisma } from '../src/database.js';
 
 describe('Token Refresh API', () => {
   let agent; // This will be used to handle the session
   let token;
 
   beforeAll(async () => {
-    await prisma.user.deleteMany({});
     agent = request.agent(app); // Create an agent instance to manage cookies
 
     // Register a user before tests
-    const registerResponse = await agent
-      .post('/api/auth/register')
-      .send({
-        username: 'testrefresh',
-        name: 'test',
-        password: 'password',
-        email: 'testrefresh@example.com',
-        role: 'ADMIN',
-      });
+    const registerResponse = await agent.post('/api/auth/register').send({
+      username: 'testrefresh',
+      name: 'test',
+      password: 'password',
+      email: 'testrefresh@example.com',
+      role: 'ADMIN',
+    });
 
     // Handle potential duplicate registration errors
     if (registerResponse.status === 409) {
-      console.log("User already exists, skipping registration.");
+      console.log('User already exists, skipping registration');
     } else {
       expect(registerResponse.status).toBe(201);
     }
 
     // Login to get tokens
-    const loginResponse = await agent
-      .post('/api/auth/login')
-      .send({
-        username: 'testrefresh',
-        password: 'password',
-      });
-
+    const loginResponse = await agent.post('/api/auth/login').send({
+      login: 'testrefresh',
+      password: 'password',
+    });
+    console.log(loginResponse.text);
     expect(loginResponse.status).toBe(200);
-    expect(loginResponse.headers["set-cookie"]).toBeDefined();
-    console.log("Body = ",loginResponse.body);
-    console.log("Header = ",loginResponse.header);
-    token = loginResponse.body.token
+    expect(loginResponse.headers['set-cookie']).toBeDefined();
+    console.log('Body = ', loginResponse.body);
+    console.log('Header = ', loginResponse.header);
+    token = loginResponse.body.token;
   });
 
   it('should refresh token when access token is expired', async () => {
@@ -64,8 +58,7 @@ describe('Token Refresh API', () => {
     expect(expiredResponse.status).toBe(401); // Assuming 401 Unauthorized for expired token
 
     // Make the request to refresh the token
-    const refreshResponse = await agent
-      .post('/api/auth/refresh');
+    const refreshResponse = await agent.post('/api/auth/refresh');
 
     expect(refreshResponse.status).toBe(200);
     expect(refreshResponse.body.token).toBeDefined(); // Ensure a new token is returned

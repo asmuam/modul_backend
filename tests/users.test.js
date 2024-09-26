@@ -1,7 +1,6 @@
 import request from 'supertest';
 import app from '../src/app.js';
-import { prisma } from "../src/database.js";
-
+import { prisma } from '../src/database.js';
 
 describe('User Management API', () => {
   let adminAgent;
@@ -9,16 +8,17 @@ describe('User Management API', () => {
   let adminToken;
   let userToken;
   let userId;
+  let adminCookies;
 
   beforeAll(async () => {
     await prisma.user.deleteMany({});
     adminAgent = request.agent(app); // Create an agent instance for admin
-    userAgent = request.agent(app);  // Create an agent instance for user
+    userAgent = request.agent(app); // Create an agent instance for user
 
     // Register users if not already registered
     await Promise.all([
       registerUser('testusersadmin', 'testusersadmin@example.com', 'ADMIN'),
-      registerUser('testusersuser', 'testusersuser@example.com', 'USER')
+      registerUser('testusersuser', 'testusersuser@example.com', 'USER'),
     ]);
   });
 
@@ -26,14 +26,16 @@ describe('User Management API', () => {
     // Log in to get tokens
     const adminResponse = await adminAgent
       .post('/api/auth/login')
-      .send({ username: 'testusersadmin', password: 'password' });
+      .send({ login: 'testusersadmin', password: 'password' });
 
     expect(adminResponse.status).toBe(200);
     adminToken = adminResponse.body.token;
+    // Capture the cookies from the response
+    adminCookies = adminResponse.headers['set-cookie'];
 
     const userResponse = await userAgent
       .post('/api/auth/login')
-      .send({ username: 'testusersuser', password: 'password' });
+      .send({ login: 'testusersuser', password: 'password' });
 
     expect(userResponse.status).toBe(200);
     userToken = userResponse.body.token;
@@ -50,14 +52,14 @@ describe('User Management API', () => {
         role: 'USER',
       });
 
-        // Handle potential duplicate registration errors
-        if (createUserResponse.status === 409) {
-            console.log("User already exists, skipping registration.");
-          } else {
-            expect(createUserResponse.status).toBe(201);
-            userId = createUserResponse.body.id;
-          }
-    console.log("UID == ",userId);    
+    // Handle potential duplicate registration errors
+    if (createUserResponse.status === 409) {
+      console.log('User already exists, skipping registration');
+    } else {
+      expect(createUserResponse.status).toBe(201);
+      userId = createUserResponse.body.id;
+    }
+    console.log('UID == ', userId);
   });
 
   afterAll(() => {
@@ -74,7 +76,7 @@ describe('User Management API', () => {
   });
 
   it('should get a user data (own data in this case) with ADMIN role', async () => {
-    console.log("UID == ",userId);
+    console.log('UID == ', userId);
     const response = await adminAgent
       .get(`/api/users/${userId}`)
       .set('Authorization', `Bearer ${adminToken}`);
@@ -84,29 +86,40 @@ describe('User Management API', () => {
   });
 
   it('should update a user with ADMIN role', async () => {
-    console.log("UID == ",userId);
+    console.log('UID == ', userId);
+    console.log('adminCookies', adminCookies);
+
     const response = await adminAgent
       .put(`/api/users/${userId}`)
       .set('Authorization', `Bearer ${adminToken}`)
-      .send({ name: 'Updated Name' });
+      .set('Cookie', adminCookies.join('; ')) // Add the captured cookies here
+      .send({
+        name: 'Updated Name',
+        username: 'new_username',
+        email: 'new@gmail.com',
+        role: 'ADMIN',
+      });
 
     expect(response.status).toBe(200);
     expect(response.body.name).toBe('Updated Name');
   });
 
   it('should partially update a user with ADMIN role', async () => {
-    console.log("UID == ",userId);
+    console.log('UID == ', userId);
+    console.log('adminCookies', adminCookies);
     const response = await adminAgent
       .patch(`/api/users/${userId}`)
       .set('Authorization', `Bearer ${adminToken}`)
+      .set('Cookie', adminCookies.join('; ')) // Add the captured cookies here
       .send({ name: 'Partially Updated Name' });
+    console.log(response);
 
     expect(response.status).toBe(200);
     expect(response.body.name).toBe('Partially Updated Name');
   });
 
   it('should delete a user with ADMIN role', async () => {
-    console.log("UID == ",userId);
+    console.log('UID == ', userId);
     const response = await adminAgent
       .delete(`/api/users/${userId}`)
       .set('Authorization', `Bearer ${adminToken}`);
@@ -115,7 +128,7 @@ describe('User Management API', () => {
   });
 
   it('should not allow USER role to perform ADMIN operations', async () => {
-    console.log("UID == ",userId);
+    console.log('UID == ', userId);
     // Attempt to get all users with USER token
     const getUsersResponse = await userAgent
       .get('/api/users/')
@@ -146,20 +159,109 @@ describe('User Management API', () => {
     expect(deleteUserResponse.status).toBe(403); // Forbidden for non-admin users
   });
 
-  // Helper function to register a user
-  async function registerUser(username, email, role) {
-    const response = await request(app)
-      .post('/api/auth/register')
+  it('should reject invalid username (XSS injection)', async () => {
+    const response = await adminAgent
+      .post('/api/users')
+      .set('Authorization', `Bearer ${adminToken}`)
       .send({
-        username,
-        name: 'test',
+        username: '<script>alert("XSS")</script>',
+        email: 'valid@example.com',
+        name: 'valid@example.com',
         password: 'password',
-        email,
-        role,
+        role: 'USER',
       });
 
+    expect(response.status).toBe(400);
+    expect(response.body.errors).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          msg: 'Username can only contain letters, numbers, and underscores',
+        }),
+      ])
+    );
+  });
+
+  // SQL Injection test
+  it('should reject SQL injection in username', async () => {
+    const response = await adminAgent
+      .post('/api/users')
+      .set('Authorization', `Bearer ${adminToken}`)
+      .send({
+        username: "test' OR 1=1 --",
+        email: 'valid2@example.com',
+        name: 'valid2@example.com',
+        password: 'password',
+        role: 'USER',
+      });
+
+    expect(response.status).toBe(400);
+    expect(response.body.errors).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          msg: 'Username can only contain letters, numbers, and underscores',
+        }),
+      ])
+    );
+  });
+
+  it('should reject invalid role assignment', async () => {
+    const response = await adminAgent
+      .post('/api/users')
+      .set('Authorization', `Bearer ${adminToken}`)
+      .send({
+        username: 'validuser',
+        email: 'validuser@example.com',
+        password: 'password',
+        role: 'INVALID_ROLE',
+      });
+
+    expect(response.status).toBe(400);
+    expect(response.body.errors).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({ msg: 'Role must be ADMIN or USER' }),
+      ])
+    );
+  });
+
+  it('should reject requests with missing fields', async () => {
+    const response = await adminAgent
+      .post('/api/users')
+      .set('Authorization', `Bearer ${adminToken}`)
+      .send({}); // Sending empty object
+
+    expect(response.status).toBe(400);
+    expect(response.body.errors).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({ msg: 'Username is required' }),
+      ])
+    );
+  });
+
+  it('should reject non-integer user ID', async () => {
+    const response = await adminAgent
+      .get('/api/users/not-an-integer')
+      .set('Authorization', `Bearer ${adminToken}`);
+
+    expect(response.status).toBe(400);
+    expect(response.body.errors).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({ msg: 'User ID must be an integer' }),
+      ])
+    );
+  });
+
+  // Helper function to register a user
+  async function registerUser(username, email, role) {
+    const response = await request(app).post('/api/auth/register').send({
+      username,
+      name: 'test',
+      password: 'password',
+      email,
+      role,
+    });
+
     if (response.status === 409) {
-      console.log(`User ${username} already exists, skipping registration.`);
+      console.log(`User ${username} already exists, skipping registration`);
     } else {
       expect(response.status).toBe(201);
     }
