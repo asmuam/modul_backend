@@ -8,7 +8,7 @@ const register = async (req, res, next) => {
     return sendResponse(
       res,
       400,
-      'Validation failed. Please check your input and try again.'
+      'Validation failed. Please check your input and try again'
     );
   }
   try {
@@ -30,7 +30,7 @@ const login = async (req, res, next) => {
     return sendResponse(
       res,
       400,
-      'Validation failed. Please check your input and try again.'
+      'Validation failed. Please check your input and try again'
     );
   }
   try {
@@ -48,7 +48,11 @@ const login = async (req, res, next) => {
 
     return sendResponse(res, 200, 'Login successful', { uid, name, token });
   } catch (error) {
-    next(error);
+    if (error.message === 'Invalid credentials') {
+      return sendResponse(res, 401, error.message); // Conflict for duplicate users
+    } else {
+      next(error);
+    }
   }
 };
 

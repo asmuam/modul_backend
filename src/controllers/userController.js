@@ -10,7 +10,7 @@ const getUsers = async (req, res, next) => {
     return sendResponse(
       res,
       400,
-      'Validation failed. Please check your input and try again.'
+      'Validation failed. Please check your input and try again'
     );
   }
   try {
@@ -27,7 +27,7 @@ const getUser = async (req, res, next) => {
     return sendResponse(
       res,
       400,
-      'Validation failed. Please check your input and try again.'
+      'Validation failed. Please check your input and try again'
     );
   }
   try {
@@ -48,7 +48,7 @@ const createUser = async (req, res, next) => {
     return sendResponse(
       res,
       400,
-      'Validation failed. Please check your input and try again.'
+      'Validation failed. Please check your input and try again'
     );
   }
   try {
@@ -81,7 +81,7 @@ const updateUser = async (req, res, next) => {
     return sendResponse(
       res,
       400,
-      'Validation failed. Please check your input and try again.'
+      'Validation failed. Please check your input and try again'
     );
   }
   const refreshToken = req.cookies.refreshToken;
@@ -126,7 +126,7 @@ const deleteUser = async (req, res, next) => {
     return sendResponse(
       res,
       400,
-      'Validation failed. Please check your input and try again.'
+      'Validation failed. Please check your input and try again'
     );
   }
   try {

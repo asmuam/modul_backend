@@ -1,5 +1,6 @@
 import { createLogger, format, transports } from 'winston';
 const { combine, timestamp, printf, colorize } = format;
+import config from '../config';
 
 // Custom log format
 const logFormat = printf(({ level, message, timestamp }) => {
@@ -21,7 +22,7 @@ const logger = createLogger({
 });
 
 // Add console transport for development
-if (process.env.NODE_ENV !== 'production') {
+if (!['production', 'test'].includes(config.node)) {
   logger.add(new transports.Console({ format: colorize() }));
 }
 

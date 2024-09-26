@@ -49,10 +49,12 @@ app.use((req, res, next) => {
   });
   next();
 });
-app.use((err, req, res) => {
-  logger.error(`Error: ${err.message} for ${req.method} ${req.url}`);
-  sendResponse(res, err.status || 500, 'Internal Server Error');
+app.use((err, req, res, next) => {
+  const errorMessage = err.message || 'Internal Server Error'; // Default message if none provided
+  logger.error(`Error: ${errorMessage} for ${req.method} ${req.url}`);
+  sendResponse(res, err.status || 500, errorMessage); // Use the default message in response
 });
+
 // ----- MIDDLEWARE -----
 
 // ----- MAIN ROUTES -----
