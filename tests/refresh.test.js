@@ -35,7 +35,7 @@ describe('Token Refresh API', () => {
     expect(loginResponse.headers['set-cookie']).toBeDefined();
     console.log('Body = ', loginResponse.body);
     console.log('Header = ', loginResponse.header);
-    token = loginResponse.body.token;
+    token = loginResponse.body.data.token;
   });
 
   it('should refresh token when access token is expired', async () => {
@@ -61,7 +61,7 @@ describe('Token Refresh API', () => {
     const refreshResponse = await agent.post('/api/auth/refresh');
 
     expect(refreshResponse.status).toBe(200);
-    expect(refreshResponse.body.token).toBeDefined(); // Ensure a new token is returned
+    expect(refreshResponse.body.data.token).toBeDefined(); // Ensure a new token is returned
   });
 
   afterAll(() => {

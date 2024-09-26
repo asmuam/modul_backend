@@ -11,7 +11,6 @@ describe('User Management API', () => {
   let adminCookies;
 
   beforeAll(async () => {
-    await prisma.user.deleteMany({});
     adminAgent = request.agent(app); // Create an agent instance for admin
     userAgent = request.agent(app); // Create an agent instance for user
 
@@ -29,7 +28,7 @@ describe('User Management API', () => {
       .send({ login: 'testusersadmin', password: 'password' });
 
     expect(adminResponse.status).toBe(200);
-    adminToken = adminResponse.body.token;
+    adminToken = adminResponse.body.data.token;
     // Capture the cookies from the response
     adminCookies = adminResponse.headers['set-cookie'];
 
@@ -38,7 +37,7 @@ describe('User Management API', () => {
       .send({ login: 'testusersuser', password: 'password' });
 
     expect(userResponse.status).toBe(200);
-    userToken = userResponse.body.token;
+    userToken = userResponse.body.data.token;
 
     // Create a user to perform operations on
     const createUserResponse = await adminAgent
@@ -57,7 +56,7 @@ describe('User Management API', () => {
       console.log('User already exists, skipping registration');
     } else {
       expect(createUserResponse.status).toBe(201);
-      userId = createUserResponse.body.id;
+      userId = createUserResponse.body.data.id;
     }
     console.log('UID == ', userId);
   });
@@ -72,7 +71,7 @@ describe('User Management API', () => {
       .set('Authorization', `Bearer ${adminToken}`);
 
     expect(response.status).toBe(200);
-    expect(Array.isArray(response.body)).toBe(true);
+    expect(Array.isArray(response.body.data)).toBe(true);
   });
 
   it('should get a user data (own data in this case) with ADMIN role', async () => {
@@ -80,9 +79,10 @@ describe('User Management API', () => {
     const response = await adminAgent
       .get(`/api/users/${userId}`)
       .set('Authorization', `Bearer ${adminToken}`);
+    console.log(response.body);
 
     expect(response.status).toBe(200);
-    expect(response.body.id).toBe(userId);
+    expect(response.body.data.id).toBe(userId);
   });
 
   it('should update a user with ADMIN role', async () => {
@@ -101,7 +101,7 @@ describe('User Management API', () => {
       });
 
     expect(response.status).toBe(200);
-    expect(response.body.name).toBe('Updated Name');
+    expect(response.body.data.name).toBe('Updated Name');
   });
 
   it('should partially update a user with ADMIN role', async () => {
@@ -112,10 +112,9 @@ describe('User Management API', () => {
       .set('Authorization', `Bearer ${adminToken}`)
       .set('Cookie', adminCookies.join('; ')) // Add the captured cookies here
       .send({ name: 'Partially Updated Name' });
-    console.log(response);
 
     expect(response.status).toBe(200);
-    expect(response.body.name).toBe('Partially Updated Name');
+    expect(response.body.data.name).toBe('Partially Updated Name');
   });
 
   it('should delete a user with ADMIN role', async () => {
@@ -172,12 +171,8 @@ describe('User Management API', () => {
       });
 
     expect(response.status).toBe(400);
-    expect(response.body.errors).toEqual(
-      expect.arrayContaining([
-        expect.objectContaining({
-          msg: 'Username can only contain letters, numbers, and underscores',
-        }),
-      ])
+    expect(response.body.message).toBe(
+      'Validation failed. Please check your input and try again'
     );
   });
 
@@ -195,12 +190,8 @@ describe('User Management API', () => {
       });
 
     expect(response.status).toBe(400);
-    expect(response.body.errors).toEqual(
-      expect.arrayContaining([
-        expect.objectContaining({
-          msg: 'Username can only contain letters, numbers, and underscores',
-        }),
-      ])
+    expect(response.body.message).toBe(
+      'Validation failed. Please check your input and try again'
     );
   });
 
@@ -216,10 +207,8 @@ describe('User Management API', () => {
       });
 
     expect(response.status).toBe(400);
-    expect(response.body.errors).toEqual(
-      expect.arrayContaining([
-        expect.objectContaining({ msg: 'Role must be ADMIN or USER' }),
-      ])
+    expect(response.body.message).toBe(
+      'Validation failed. Please check your input and try again'
     );
   });
 
@@ -230,10 +219,8 @@ describe('User Management API', () => {
       .send({}); // Sending empty object
 
     expect(response.status).toBe(400);
-    expect(response.body.errors).toEqual(
-      expect.arrayContaining([
-        expect.objectContaining({ msg: 'Username is required' }),
-      ])
+    expect(response.body.message).toBe(
+      'Validation failed. Please check your input and try again'
     );
   });
 
@@ -243,10 +230,8 @@ describe('User Management API', () => {
       .set('Authorization', `Bearer ${adminToken}`);
 
     expect(response.status).toBe(400);
-    expect(response.body.errors).toEqual(
-      expect.arrayContaining([
-        expect.objectContaining({ msg: 'User ID must be an integer' }),
-      ])
+    expect(response.body.message).toBe(
+      'Validation failed. Please check your input and try again'
     );
   });
 

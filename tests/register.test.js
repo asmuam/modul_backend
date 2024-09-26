@@ -34,10 +34,8 @@ describe('User Registration API', () => {
       });
 
     expect(registerResponse.status).toBe(400);
-    expect(registerResponse.body.errors).toEqual(
-      expect.arrayContaining([
-        expect.objectContaining({ msg: 'Username is required' }),
-      ])
+    expect(registerResponse.body.message).toBe(
+      'Validation failed. Please check your input and try again'
     );
   });
 
@@ -53,12 +51,8 @@ describe('User Registration API', () => {
       });
 
     expect(registerResponse.status).toBe(400);
-    expect(registerResponse.body.errors).toEqual(
-      expect.arrayContaining([
-        expect.objectContaining({
-          msg: 'Username must be between 3 and 20 characters long',
-        }),
-      ])
+    expect(registerResponse.body.message).toBe(
+      'Validation failed. Please check your input and try again'
     );
   });
 
@@ -74,12 +68,8 @@ describe('User Registration API', () => {
       });
 
     expect(registerResponse.status).toBe(400);
-    expect(registerResponse.body.errors).toEqual(
-      expect.arrayContaining([
-        expect.objectContaining({
-          msg: 'Username can only contain letters, numbers, and underscores',
-        }),
-      ])
+    expect(registerResponse.body.message).toBe(
+      'Validation failed. Please check your input and try again'
     );
   });
 
@@ -114,10 +104,8 @@ describe('User Registration API', () => {
       });
 
     expect(registerResponse.status).toBe(400);
-    expect(registerResponse.body.errors).toEqual(
-      expect.arrayContaining([
-        expect.objectContaining({ msg: 'Email must be valid' }),
-      ])
+    expect(registerResponse.body.message).toBe(
+      'Validation failed. Please check your input and try again'
     );
   });
 });

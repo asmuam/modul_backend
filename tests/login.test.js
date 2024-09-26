@@ -34,7 +34,7 @@ describe('User Login API', () => {
     });
 
     expect(response.status).toBe(200);
-    expect(response.body.token).toBeDefined();
+    expect(response.body.data.token).toBeDefined();
     expect(response.headers['set-cookie']).toBeDefined();
 
     const cookies = response.headers['set-cookie'];
@@ -47,7 +47,7 @@ describe('User Login API', () => {
     }
 
     refreshToken = refreshTokenCookie.split(';')[0].split('=')[1];
-    token = response.body.token;
+    token = response.body.data.token;
   });
 
   it('should fail to login with incorrect password and return 401', async () => {
@@ -55,9 +55,10 @@ describe('User Login API', () => {
       login: 'testlogin',
       password: 'wrongpassword', // Incorrect password
     });
+    console.log(response.body);
 
     expect(response.status).toBe(401); // Expect unauthorized status
-    expect(response.body.token).toBeUndefined(); // No token should be returned
+    expect(response.body.message).toBe('Invalid credentials'); // No token should be returned
   });
 
   it('should fail to login with non-existent user and return 401', async () => {
@@ -67,7 +68,7 @@ describe('User Login API', () => {
     });
 
     expect(response.status).toBe(401); // Expect unauthorized status
-    expect(response.body.token).toBeUndefined(); // No token should be returned
+    expect(response.body.message).toBe('Invalid credentials'); // No token should be returned
   });
 
   it('should return 400 for missing username/email', async () => {
@@ -76,12 +77,8 @@ describe('User Login API', () => {
     });
 
     expect(response.status).toBe(400);
-    expect(response.body.errors).toEqual(
-      expect.arrayContaining([
-        expect.objectContaining({
-          msg: 'Username or email is required',
-        }),
-      ])
+    expect(response.body.message).toBe(
+      'Validation failed. Please check your input and try again'
     );
   });
 
@@ -91,12 +88,8 @@ describe('User Login API', () => {
     });
 
     expect(response.status).toBe(400);
-    expect(response.body.errors).toEqual(
-      expect.arrayContaining([
-        expect.objectContaining({
-          msg: 'Password is required',
-        }),
-      ])
+    expect(response.body.message).toBe(
+      'Validation failed. Please check your input and try again'
     );
   });
 
@@ -104,12 +97,8 @@ describe('User Login API', () => {
     const response = await request(app).post('/api/auth/login').send({});
 
     expect(response.status).toBe(400);
-    expect(response.body.errors).toEqual(
-      expect.arrayContaining([
-        expect.objectContaining({
-          msg: 'Username or email is required',
-        }),
-      ])
+    expect(response.body.message).toBe(
+      'Validation failed. Please check your input and try again'
     );
   });
 
@@ -120,12 +109,8 @@ describe('User Login API', () => {
     });
 
     expect(response.status).toBe(400);
-    expect(response.body.errors).toEqual(
-      expect.arrayContaining([
-        expect.objectContaining({
-          msg: 'Login must be a valid email or a username (3-20 characters, letters, numbers, and underscores only)',
-        }),
-      ])
+    expect(response.body.message).toBe(
+      'Validation failed. Please check your input and try again'
     );
   });
 
@@ -136,12 +121,8 @@ describe('User Login API', () => {
     });
 
     expect(response.status).toBe(400);
-    expect(response.body.errors).toEqual(
-      expect.arrayContaining([
-        expect.objectContaining({
-          msg: 'Login must be a valid email or a username (3-20 characters, letters, numbers, and underscores only)',
-        }),
-      ])
+    expect(response.body.message).toBe(
+      'Validation failed. Please check your input and try again'
     );
   });
 

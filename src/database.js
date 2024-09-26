@@ -33,4 +33,10 @@ const connectDatabase = async () => {
   }
 };
 
-export { prisma, connectDatabase };
+const userCleanup = async () => {
+  await prisma.user.deleteMany(); // Ganti dengan model yang ingin dihapus
+  // Hapus entitas lainnya jika perlu
+  console.log('Table user cleaned up');
+};
+
+export { prisma, connectDatabase, userCleanup };
