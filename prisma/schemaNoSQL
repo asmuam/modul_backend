@@ -5,7 +5,7 @@
 // Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
 
 datasource db {
-  provider = "mysql"
+  provider = "mongodb" // Ganti provider ke mongodb
   url      = env("DATABASE_URL")
 }
 
@@ -13,14 +13,14 @@ generator client {
   provider = "prisma-client-js"
 }
 
-model user {
-  id            Int      @id @default(autoincrement())
-  username      String   @unique @db.VarChar(20)
+model User {
+  id            String   @id @default(auto()) @map("_id") // Menggunakan String ID untuk MongoDB
+  username      String   @unique @db.String
   name          String   
   password      String
   email         String   @unique
-  role          String   @default("USER")  // Add role field with default value
+  role          String   @default("USER")
   date_created  DateTime @default(now())
-  date_updated  DateTime @updatedAt
-  refresh_token String?  @db.VarChar(255) // Adjust length as needed
+  date_updated  DateTime @updatedAt // Gunakan @updatedAt untuk pembaruan otomatis
+  refresh_token String?  @db.String // Optional field
 }
