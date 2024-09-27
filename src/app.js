@@ -9,6 +9,7 @@ import rateLimit from 'express-rate-limit';
 import compression from 'compression';
 import logger from './utils/logger.js';
 import sendResponse from './utils/responseUtil.js'; // Import utilitas respons
+import helmet from 'helmet';
 
 const largeData = {
   users: Array.from({ length: 1000000 }, (_, i) => ({
@@ -38,6 +39,31 @@ app.use(
     credentials: true, // Allows cookies to be sent and received
   })
 );
+app.use(
+  helmet({
+    // Mengatur CSP untuk mencegah XSS
+    contentSecurityPolicy: {
+      directives: {
+        defaultSrc: ["'self'"],
+        scriptSrc: ["'self'", 'https://trusted-scripts.com'], // Ubah sesuai sumber tepercaya
+        objectSrc: ["'none'"],
+        upgradeInsecureRequests: [], // Secara otomatis upgrade permintaan HTTP ke HTTPS
+      },
+    },
+    crossOriginEmbedderPolicy: true, // Mencegah embedding konten lintas asal
+    crossOriginOpenerPolicy: 'same-origin', // Mencegah membuka jendela lintas asal
+    crossOriginResourcePolicy: { policy: 'same-origin' }, // Mencegah permintaan sumber lintas asal
+    noSniff: true, // Mencegah browser dari menebak jenis konten
+    ieNoOpen: true, // Mencegah Internet Explorer dari membuka file unduhan
+    hidePoweredBy: true, // Menghapus header X-Powered-By
+    hsts: {
+      maxAge: 63072000, // 2 tahun
+      includeSubDomains: true, // Menerapkan HSTS untuk subdomain
+      preload: true, // Mengizinkan preload HSTS
+    },
+    xssFilter: true, // Mengaktifkan XSS Filter di browser
+  })
+);
 app.use(limiter);
 app.use((req, res, next) => {
   logger.info(`Request: ${req.method} ${req.url}`);
@@ -49,7 +75,7 @@ app.use((req, res, next) => {
   });
   next();
 });
-app.use((err, req, res, next) => {
+app.use((err, req, res) => {
   const errorMessage = err.message || 'Internal Server Error'; // Default message if none provided
   logger.error(`Error: ${errorMessage} for ${req.method} ${req.url}`);
   sendResponse(res, err.status || 500, errorMessage); // Use the default message in response
