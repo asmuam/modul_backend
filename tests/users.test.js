@@ -1,6 +1,7 @@
 import request from 'supertest';
 import app from '../src/app.js';
 import { prisma } from '../src/database.js';
+import cacheService from '../src/cache/cacheManager.js'; // Import the cache service
 
 describe('User Management API', () => {
   let adminAgent;
@@ -22,6 +23,7 @@ describe('User Management API', () => {
   });
 
   beforeEach(async () => {
+    cacheService.clear(); // Clear cache before each test
     // Log in to get tokens
     const adminResponse = await adminAgent
       .post('/api/auth/login')
@@ -233,6 +235,48 @@ describe('User Management API', () => {
     expect(response.body.message).toBe(
       'Validation failed. Please check your input and try again'
     );
+  });
+
+  it('should return cached user data', async () => {
+    for (let index = 0; index < 10; index++) {
+      const randomSuffix = Date.now(); // Menggunakan timestamp sebagai pengidentifikasi unik
+      await adminAgent
+        .post('/api/users')
+        .set('Authorization', `Bearer ${adminToken}`)
+        .send({
+          username: `testinguserAPI_${randomSuffix}`, // Username unik
+          name: 'Test User',
+          password: 'password',
+          email: `testinguserAPI_${randomSuffix}@example.com`, // Email unik
+          role: 'USER',
+        });
+    }
+    cacheService.clear(); // Clear cache before each test
+    // Simulate first request
+    const startTime = Date.now();
+    const firstResponse = await adminAgent
+      .get('/api/users/')
+      .set('Authorization', `Bearer ${adminToken}`);
+
+    const firstDuration = Date.now() - startTime;
+    expect(firstResponse.status).toBe(200);
+    expect(Array.isArray(firstResponse.body.data)).toBe(true);
+
+    // Tambahkan delay untuk memberikan waktu cache
+    await new Promise((resolve) => setTimeout(resolve, 1000)); // Delay 1 detik
+
+    // Simulate second request, expect it to be faster due to caching
+    const cachedStartTime = Date.now();
+    const secondResponse = await adminAgent
+      .get('/api/users/')
+      .set('Authorization', `Bearer ${adminToken}`);
+
+    const cachedDuration = Date.now() - cachedStartTime;
+    expect(secondResponse.status).toBe(200);
+    expect(Array.isArray(secondResponse.body.data)).toBe(true);
+
+    // Check that the second request was faster, indicating caching was used
+    expect(cachedDuration).toBeLessThan(firstDuration);
   });
 
   // Helper function to register a user
