@@ -3,6 +3,7 @@ import { validationResult } from 'express-validator';
 import { verifyToken } from '../services/authService.js';
 import config from '../config.js';
 import sendResponse from '../utils/responseUtil.js'; // Import utilitas respons
+import CustomError from '../utils/CustomError.js';
 
 const getUsers = async (req, res, next) => {
   const errors = validationResult(req);
@@ -105,6 +106,8 @@ const updateUser = async (req, res, next) => {
     }
 
     // Check role downgrade
+    // harusnya tidak boleh mendowngrade diri sendiri maupun menaikkan diri sendiri
+    // role hanya bisa diubah admin saja namun controller update bisa diakses siapa saja minimal user
     if (isRoleDowngrade(currentUserRole, req.body.role)) {
       return sendResponse(res, 403, 'Cannot downgrade role'); // Forbidden
     }
@@ -144,10 +147,43 @@ const deleteUser = async (req, res, next) => {
   }
 };
 
+const uploadProfilePicture = async (req, res, next) => {
+  const errors = validationResult(req);
+  if (!errors.isEmpty()) {
+    return sendResponse(
+      res,
+      400,
+      'Validation failed. Please check your input and try again'
+    );
+  }
+  // Check for Multer errors
+  if (!req.file) {
+    return next(
+      new CustomError('File upload only supports the following filetypes', 400)
+    );
+  }
+
+  // Further processing if no errors
+  // Example: save the profile picture details to the database
+  // ...
+
+  res.status(200).json({
+    message: 'Profile picture uploaded successfully',
+    filename: req.file.filename,
+  });
+};
+
 // Helper function to determine if a role downgrade is occurring
 const isRoleDowngrade = (currentRole, newRole) => {
   const roleHierarchy = ['USER', 'ADMIN']; // Define the hierarchy
   return roleHierarchy.indexOf(newRole) < roleHierarchy.indexOf(currentRole);
 };
 
-export { getUsers, createUser, getUser, updateUser, deleteUser };
+export {
+  getUsers,
+  createUser,
+  getUser,
+  updateUser,
+  deleteUser,
+  uploadProfilePicture,
+};

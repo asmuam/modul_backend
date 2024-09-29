@@ -5,9 +5,14 @@ import {
   getUser,
   updateUser,
   deleteUser,
+  uploadProfilePicture,
 } from '../controllers/userController.js';
 import authMiddleware from '../middleware/authMiddleware.js';
 import { body, param } from 'express-validator';
+import {
+  convertHEICtoJPEG,
+  uploadProfilePictureMiddleware,
+} from '../middleware/uploadMiddleware.js';
 
 const router = express.Router();
 
@@ -136,6 +141,16 @@ router.delete(
     param('userId').isInt().withMessage('User ID must be an integer').toInt(), // Konversi ke integer
   ],
   deleteUser
+);
+router.post(
+  '/:userId/profile-picture',
+  [
+    authMiddleware(['ADMIN', 'USER']),
+    param('userId').isInt().withMessage('User ID must be an integer').toInt(),
+    uploadProfilePictureMiddleware, // Handle single file upload
+    convertHEICtoJPEG, // Convert HEIC to JPEG
+  ],
+  uploadProfilePicture
 );
 
 export default router;
