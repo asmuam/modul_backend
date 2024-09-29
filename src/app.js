@@ -69,18 +69,12 @@ app.use((req, res, next) => {
   logger.info(`Request: ${req.method} ${req.url}`);
   res.on('finish', () => {
     // Cek jika respons sudah ditangani oleh middleware penanganan kesalahan
-    if (res.status < 400) {
+    if (res.statusCode < 400) {
       logger.info(`Response: ${res.statusCode} for ${req.method} ${req.url}`);
     }
   });
   next();
 });
-app.use((err, req, res, next) => {
-  const errorMessage = err.message || 'Internal Server Error'; // Default message if none provided
-  logger.error(`Error: ${errorMessage} for ${req.method} ${req.url}`);
-  sendResponse(res, err.status || 500, errorMessage); // Use the default message in response
-});
-
 // ----- MIDDLEWARE -----
 
 // ----- MAIN ROUTES -----
@@ -99,5 +93,12 @@ app.get('/api/compression', compression({ threshold: 0 }), (req, res) => {
   res.json(largeData);
 });
 // ----- TEST ROUTES -----
+
+// Error-handling middleware
+app.use((err, req, res, next) => {
+  const errorMessage = err.message || 'Internal Server Error';
+  logger.error(`Error: ${errorMessage} for ${req.method} ${req.url}`);
+  sendResponse(res, err.status || 500, errorMessage);
+});
 
 export default app;
