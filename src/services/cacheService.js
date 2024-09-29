@@ -8,6 +8,7 @@ class CacheService {
 
   async set(key, value, ttl) {
     try {
+      // return true;
       return await this.cacheProvider.set(key, value, ttl);
     } catch (error) {
       throw new CustomError(
@@ -24,6 +25,10 @@ class CacheService {
         // Assuming null means the key doesn't exist
         throw new CustomError('Cache key not found', 404);
       }
+      if (value !== null) {
+        // logging purpose please delete in production kkk
+        console.log('Cache hit for key:', key); // Tambahkan log untuk cache hit
+      }
       return value;
     } catch (error) {
       throw new CustomError(
@@ -33,7 +38,7 @@ class CacheService {
     }
   }
 
-  async del(key) {
+  async delete(key) {
     try {
       await this.cacheProvider.del(key);
     } catch (error) {
@@ -73,6 +78,17 @@ class CacheService {
     } catch (error) {
       throw new CustomError(
         `Cache multi-get operation failed: ${error.message}`,
+        500
+      );
+    }
+  }
+
+  async clear() {
+    try {
+      await this.cacheProvider.flushAll(); // node-cache specific command to clear all cache
+    } catch (error) {
+      throw new CustomError(
+        `Cache clear operation failed: ${error.message}`,
         500
       );
     }
