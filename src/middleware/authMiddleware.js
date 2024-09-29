@@ -1,5 +1,6 @@
 import config from '../config.js';
 import * as authService from '../services/authService.js';
+import sendResponse from '../utils/responseUtil.js'; // Import utilitas respons
 
 const authMiddleware = (roles = []) => {
   return (req, res, next) => {
@@ -11,15 +12,15 @@ const authMiddleware = (roles = []) => {
 
         // Check if user has required role
         if (roles.length && !roles.includes(decoded.role)) {
-          return res.status(403).send('Forbidden');
+          return sendResponse(res, 403, 'Forbidden');
         }
 
         next();
       } catch (error) {
-        res.status(401).send('Unauthorized');
+        return sendResponse(res, 401, 'Unauthorized', error);
       }
     } else {
-      res.status(401).send('No token provided');
+      return sendResponse(res, 401, 'No token provided');
     }
   };
 };

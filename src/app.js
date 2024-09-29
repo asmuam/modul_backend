@@ -69,13 +69,13 @@ app.use((req, res, next) => {
   logger.info(`Request: ${req.method} ${req.url}`);
   res.on('finish', () => {
     // Cek jika respons sudah ditangani oleh middleware penanganan kesalahan
-    if (res.statusCode < 400) {
+    if (res.status < 400) {
       logger.info(`Response: ${res.statusCode} for ${req.method} ${req.url}`);
     }
   });
   next();
 });
-app.use((err, req, res) => {
+app.use((err, req, res, next) => {
   const errorMessage = err.message || 'Internal Server Error'; // Default message if none provided
   logger.error(`Error: ${errorMessage} for ${req.method} ${req.url}`);
   sendResponse(res, err.status || 500, errorMessage); // Use the default message in response
@@ -99,10 +99,5 @@ app.get('/api/compression', compression({ threshold: 0 }), (req, res) => {
   res.json(largeData);
 });
 // ----- TEST ROUTES -----
-
-app.use((err, req, res) => {
-  console.error(err.stack);
-  res.status(500).send('Something broke!');
-});
 
 export default app;
