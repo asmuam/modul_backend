@@ -2,10 +2,15 @@
 
 ## Fitur yang Perlu Ditambahkan
 
+- [ ] LOGGING + Custom Error Handling + Custom Server Response
 - [ ] swagger
-- [ ] multer untuk file
 - [ ] apollo + graphql untukgraphql
 - [ ] socket.io untuk websocket
+- [ ] logika bisnis seperti:
+
+1. user bisa menghapus akunnya sendiri tapi tdk yg lain, begitu juga edit dsb
+2. admin yang bisa menaikkan/menurunkan role dan tdk bisa menurunkan rolenya sendiri selebihnya tdk boleh
+3. dll
 
 ## Perbaikan Bug
 
@@ -29,3 +34,4 @@
 - [✅] perbarui test karena perbedaan respon akibat logger
 - [✅] helmet (berdasar gpt)
 - [✅] node-cache with IoC for redis
+- [✅] multer untuk file
